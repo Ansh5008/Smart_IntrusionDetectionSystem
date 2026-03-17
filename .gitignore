@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Large dataset files (CICIDS2017 CSVs — download separately)
+data/*.csv
+data/*.pcap
+
+# Trained model artifacts (regenerated via Model Center)
+models/*.pkl
+models/*.joblib
+
+# Logs (auto-generated at runtime)
+logs/*.json
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit cache
+.streamlit/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3

@@ -1,0 +1,10 @@
+numpy
+pandas
+scikit-learn
+joblib
+streamlit>=1.28.0
+plotly>=5.17.0
+scapy
+scipy
+requests
+supabase>=2.0.0
