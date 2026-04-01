@@ -16,7 +16,7 @@ def get_connection() -> sqlite3.Connection:
 
 
 def init_db() -> None:
-    """Initialize only the local SQLite tables (live packet capture).
+    """Initialize only the local SQLite tables (live packet capture and IPS data).
     User authentication tables are stored in Supabase.
     """
     conn = get_connection()
@@ -35,6 +35,61 @@ def init_db() -> None:
             severity    TEXT    DEFAULT 'LOW',
             info        TEXT    DEFAULT ''
         );
+        
+        CREATE TABLE IF NOT EXISTS blocked_ips (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip_address  TEXT    UNIQUE NOT NULL,
+            reason      TEXT    NOT NULL,
+            timestamp   TEXT    NOT NULL,
+            is_active   INTEGER DEFAULT 1
+        );
+        
+        CREATE TABLE IF NOT EXISTS ips_logs (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp   TEXT    NOT NULL,
+            src_ip      TEXT    NOT NULL,
+            action      TEXT    NOT NULL,   -- e.g., 'MONITOR', 'THROTTLE', 'BLOCK'
+            reason      TEXT    NOT NULL,
+            risk_score  REAL    DEFAULT 0.0
+        );
+        
+        CREATE TABLE IF NOT EXISTS threat_intel (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip_address  TEXT    UNIQUE NOT NULL,
+            threat_type TEXT    NOT NULL,
+            added_at    TEXT    NOT NULL
+        );
+        
+        CREATE TABLE IF NOT EXISTS system_settings (
+            key         TEXT PRIMARY KEY,
+            value       TEXT NOT NULL
+        );
+        
+        -- Default settings
+        INSERT OR IGNORE INTO system_settings (key, value) VALUES ('auto_mode', 'Manual');
     """)
     conn.commit()
     conn.close()
+
+
+def get_setting(key: str, default: str = "") -> str:
+    """Retrieve a persistent system setting."""
+    conn = get_connection()
+    try:
+        row = conn.execute("SELECT value FROM system_settings WHERE key = ?", (key,)).fetchone()
+        return row["value"] if row else default
+    finally:
+        conn.close()
+
+
+def set_setting(key: str, value: str) -> None:
+    """Update or insert a persistent system setting."""
+    conn = get_connection()
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO system_settings (key, value) VALUES (?, ?)",
+            (key, value)
+        )
+        conn.commit()
+    finally:
+        conn.close()

@@ -112,19 +112,37 @@ def _store_packet(info: dict, prediction: str, confidence: float, severity: str)
 
 
 def _packet_handler(packet: Any):
-    """Process a single captured packet."""
+    """Process a single captured packet through ML & IPS engines."""
+    from backend.ips_engine import evaluate_packet
+    
     info = _extract_packet_info(packet)
     prediction, confidence = _classify_packet(packet)
-    severity = _severity_from_prediction(prediction, info["dst_port"])
+    
+    # ── IPS Engine Evaluation ──
+    # Runs the packet through the Stateful Hybrid Pipeline
+    # Updates behavioral profile and triggers Mitigation actions if Risk Score > Thresholds
+    is_allowed = evaluate_packet(info, prediction, confidence)
+    
+    # ── Override Result if IPS Dropped ──
+    if not is_allowed:
+        prediction = "BLOCKED_BY_IPS"
+        severity = "CRITICAL"
+        confidence = 1.0  # IPS rules are explicit
+    else:
+        severity = _severity_from_prediction(prediction, info["dst_port"])
+        
     _store_packet(info, prediction, confidence, severity)
 
 
+_capture_error = ""
+
 def _capture_loop(interface: str | None, packet_count: int):
     """Main capture loop running in background thread."""
-    global _capture_running
+    global _capture_running, _capture_error
     try:
         from scapy.all import sniff
-    except ImportError:
+    except ImportError as e:
+        _capture_error = f"ImportError: {e}"
         _capture_running = False
         return
 
@@ -137,31 +155,30 @@ def _capture_loop(interface: str | None, packet_count: int):
             store=False,
             stop_filter=lambda _: not _capture_running,
         )
-    except Exception:
-        pass
+    except Exception as e:
+        _capture_error = str(e)
     finally:
         _capture_running = False
 
-
-def start_capture(interface: str | None = None, packet_count: int = 0) -> bool:
-    """Start live capture in a background thread.
-    packet_count=0 means capture indefinitely until stopped.
-    """
-    global _capture_thread, _capture_running
+def start_capture(interface: str | None = None, packet_count: int = 0) -> tuple[bool, str]:
+    """Start live capture in a background thread."""
+    global _capture_thread, _capture_running, _capture_error
     if _capture_running:
-        return False  # Already running
+        return False, "Already running"
 
     init_db()
+    _capture_error = ""
     _capture_thread = threading.Thread(
         target=_capture_loop, args=(interface, packet_count), daemon=True
     )
     _capture_thread.start()
-    time.sleep(0.5)  # Let it initialize
-    return _capture_running
-
+    time.sleep(1.0)  # Wait slightly longer to catch immediate crashes
+    
+    if not _capture_running and _capture_error:
+        return False, _capture_error
+    return _capture_running, ""
 
 def stop_capture():
-    """Signal the capture thread to stop."""
     global _capture_running
     _capture_running = False
 

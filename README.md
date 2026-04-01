@@ -238,5 +238,5 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 ---
 
 <p align="center">
-  Made with ❤️ for cybersecurity education &nbsp;|&nbsp; CyberShield IDS v2.0
+  Made for cybersecurity education &nbsp;|&nbsp; CyberShield IDS v2.0
 </p>

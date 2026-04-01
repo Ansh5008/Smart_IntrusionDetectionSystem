@@ -65,17 +65,8 @@ def signup_user(
         if res.user is None:
             return False, "Sign-up failed. The email may already be registered."
 
-        # Store additional profile data (including email for username-based login lookups)
-        supabase.table("profiles").insert(
-            {
-                "id": res.user.id,
-                "username": username,
-                "email": email,
-                "full_name": full_name,
-                "role": role,
-            }
-        ).execute()
-
+        # Profile is created automatically by the on_auth_user_created trigger
+        # which reads username, full_name, and role from raw_user_meta_data.
         return True, "Account created successfully!"
 
     except AuthApiError as e:
@@ -134,7 +125,7 @@ def login_user(username_or_email: str, password: str) -> tuple[bool, str, dict |
     except AuthApiError as e:
         msg = str(e).lower()
         if "invalid" in msg or "credentials" in msg:
-            return False, "Incorrect email or password.", None
+            return False, "Invalid login credentials. If you signed up with Google, please use 'Continue with Google' below, or set a password via 'Recover Access'.", None
         return False, f"Login error: {e}", None
     except Exception as e:
         return False, f"Login error: {e}", None
@@ -191,4 +182,31 @@ def update_password(new_password: str) -> tuple[bool, str]:
         return False, "Failed to update password."
     except Exception as e:
         return False, f"Error updating password: {e}"
+
+
+def get_all_profiles() -> list[dict]:
+    """Retrieve all user profiles from the profiles table (Admin only)."""
+    try:
+        res = supabase.table("profiles").select("*").execute()
+        return res.data if res.data else []
+    except Exception:
+        return []
+
+
+def update_profile(user_id: str, updates: dict) -> bool:
+    """Allow a user to update their own profile data (name, avatar, etc)."""
+    try:
+        supabase.table("profiles").update(updates).eq("id", user_id).execute()
+        return True
+    except Exception:
+        return False
+
+
+def update_profile_role(user_id: str, new_role: str) -> bool:
+    """Allow an Admin to update another user's role."""
+    try:
+        supabase.table("profiles").update({"role": new_role}).eq("id", user_id).execute()
+        return True
+    except Exception:
+        return False
 
