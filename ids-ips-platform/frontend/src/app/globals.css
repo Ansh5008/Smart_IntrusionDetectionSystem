@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: #0d1b2a;
+  --bg-tertiary: #1b2838;
+  --bg-card: rgba(13, 27, 42, 0.7);
+  --border-glow: rgba(0, 245, 255, 0.12);
+  --cyan: #00f5ff;
+  --cyan-dim: rgba(0, 245, 255, 0.15);
+  --red: #ff073a;
+  --green: #39ff14;
+  --amber: #ffb700;
+  --purple: #a855f7;
+  --text-primary: #e0e6ed;
+  --text-muted: #6b7b8d;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 245, 255, 0.2) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 245, 255, 0.2);
+  border-radius: 3px;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a1a 0%, #0d1b2a 50%, #1a1a2e 100%);
+  color: var(--text-primary);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes critical-pulse {
+  0%, 100% { box-shadow: 0 0 4px var(--red); }
+  50% { box-shadow: 0 0 16px var(--red), 0 0 32px rgba(255, 7, 58, 0.3); }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+}
+
+.glass-panel-sm {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+}
+
+.severity-critical {
+  background: linear-gradient(135deg, #ff073a, #ff4444);
+  color: #fff;
+  animation: pulse-glow 1.5s infinite;
+}
+.severity-high {
+  background: linear-gradient(135deg, #ff6b35, #ffb700);
+  color: #000;
+}
+.severity-medium {
+  background: linear-gradient(135deg, #ffb700, #ffd700);
+  color: #000;
+}
+.severity-low {
+  background: linear-gradient(135deg, #39ff14, #00cc44);
+  color: #000;
+}
+
+.badge {
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.animate-fade-in {
+  animation: fade-in-up 0.4s ease-out;
+}
+
+.mono {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}

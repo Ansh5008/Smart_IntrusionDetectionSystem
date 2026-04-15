@@ -1278,7 +1278,7 @@ if selected_tab == "tab7":
         st.markdown("#### 🛑 Actively Blocked Entities")
         blocked = get_active_blocked_ips()
         if blocked:
-            df_b = _pd.DataFrame(blocked)
+            df_b = pd.DataFrame(blocked)
             st.dataframe(df_b[["ip_address", "reason", "timestamp"]], use_container_width=True, height=250)
             
             with st.form("unblock_form", clear_on_submit=True):
