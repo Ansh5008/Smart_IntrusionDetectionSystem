@@ -1,18 +1,19 @@
 <p align="center">
-  <img src="assets/banner.png" alt="CyberShield IDS Banner" width="100%" />
+  <img src="assets/banner.png" alt="CyberShield IDS/IPS Banner" width="100%" />
 </p>
 
-<h1 align="center">CyberShield IDS</h1>
+<h1 align="center">CyberShield IDS/IPS</h1>
 
 <p align="center">
-  <strong>Smart Intrusion Detection System</strong><br/>
-  ML-powered network security monitoring with real-time packet capture and a premium Streamlit dashboard.
+  <strong>Enterprise-Grade Intrusion Detection & Prevention System</strong><br/>
+  Real-time network threat detection and active prevention powered by ML, WebSockets, and a modern SOC dashboard.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/Streamlit-1.28+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" />
-  <img src="https://img.shields.io/badge/Scikit--Learn-RandomForest-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" />
+  <img src="https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
   <img src="https://img.shields.io/badge/Supabase-Auth-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
   <img src="https://img.shields.io/badge/Dataset-CICIDS2017-purple?style=for-the-badge" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
@@ -22,21 +23,68 @@
 
 ## Overview
 
-**CyberShield IDS** is a full-featured Intrusion Detection System that combines a **RandomForest ML classifier** trained on the CICIDS2017 network traffic dataset with a live, interactive dashboard. It can classify network traffic in real time, simulate attack scenarios for testing, and provides a secure multi-role web interface backed by **Supabase Authentication**.
+**CyberShield IDS/IPS** is a production-ready, full-stack Intrusion Detection and Prevention System built for modern Security Operations Centers. It combines a **rule-based detection engine** trained on the CICIDS2017 dataset with **real-time WebSocket streaming**, an **active IPS response layer**, and a **glassmorphic Next.js SOC dashboard** — all secured by Supabase authentication.
+
+The platform evolved from a standalone ML classifier into a complete threat detection and prevention ecosystem, capable of identifying DDoS, Port Scans, Brute Force, Data Exfiltration, and Web Attacks — and actively responding to them in real time.
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        CyberShield Platform                     │
+│                                                                 │
+│  ┌──────────────────┐        ┌──────────────────────────────┐   │
+│  │  Next.js Frontend│◄──WS──►│     FastAPI Backend          │   │
+│  │  (SOC Dashboard) │        │  ┌──────────┐ ┌──────────┐  │   │
+│  │  - Recharts      │◄─REST─►│  │  IDS     │ │  IPS     │  │   │
+│  │  - Framer Motion │        │  │ Detector │ │ Engine   │  │   │
+│  │  - Supabase SSR  │        │  └──────────┘ └──────────┘  │   │
+│  └──────────────────┘        │  ┌──────────────────────┐   │   │
+│                              │  │  Simulation Scheduler │   │   │
+│  ┌──────────────────┐        │  │  (Attack Scenarios)   │   │   │
+│  │  Supabase        │        │  └──────────────────────┘   │   │
+│  │  - Auth (JWT)    │        └──────────────────────────────┘   │
+│  │  - User Profiles │                                           │
+│  └──────────────────┘                                           │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## Features
 
-| Module | Description |
-|:---|:---|
-| ⚡ **Live Monitoring** | Real-time threat level banner, network activity timelines, and rolling attack distribution charts |
-| 📡 **Live Packet Capture** | Scapy-based packet sniffer that classifies each packet using the trained ML model |
-| 🎯 **Attack Simulation** | Synthesize DDoS, Port Scan, Brute Force, Web Attack, Data Exfiltration, or Mixed traffic |
-| 📊 **Dataset Analytics** | Load and visualise CICIDS2017 CSV files, then run batch IDS predictions |
-| 🧠 **Model Center** | Train / retrain the RandomForest model, view feature importances and performance metrics |
-| 🔔 **Alerts & Logs** | Filterable alert feed by severity and historical per-day JSON prediction log viewer |
-| 🔐 **Authentication** | Supabase-powered email/password sign-up, Google OAuth, and password reset |
+### 🛡️ Intrusion Detection Engine
+- **Sliding-window rule engine** detecting DDoS, Port Scans, Brute Force, and Data Exfiltration
+- **Confidence scoring** and dynamic severity classification (LOW → CRITICAL)
+- **Composite rule support** for multi-signal attack detection (e.g., high entropy + large payload + non-standard port)
+- Threat intelligence rules defined in `ids/rules.py` and evaluated per-packet in real time
+
+### 🚫 Intrusion Prevention System
+- Active response layer (`backend/ips_engine.py`) that evaluates alerts and triggers countermeasures
+- Supports IP blocking, connection termination, and alert escalation
+- Prevention actions logged via `backend/ips_actions.py`
+
+### 📡 Real-Time Streaming
+- **WebSocket endpoints** (`/ws/traffic`, `/ws/alerts`) push live packet and alert data to the frontend
+- Attack simulation scheduler continuously generates realistic traffic with configurable attack scenarios
+- Connection manager handles concurrent SOC analyst sessions
+
+### 🖥️ SOC Dashboard (Next.js)
+- **Glassmorphic UI** with Tailwind CSS, Framer Motion animations, and Recharts visualisations
+- Pages: **Overview**, **Live Traffic**, **Alerts**, **Logs**, **Threat Intelligence**, **Settings**
+- Responsive layout with sidebar navigation and real-time data hooks (`useWebSocket`)
+
+### 🔐 Authentication
+- Supabase-powered auth with **JWT verification** on all protected API routes
+- Supports **Email/Password** and **Google OAuth**
+- Server-side session management via `@supabase/ssr`
+
+### 🤖 ML Classifier (Legacy / Batch Mode)
+- **RandomForest** trained on CICIDS2017 (~99.87% accuracy)
+- Batch prediction pipeline via `detection/predict.py`
+- Model training tools in `src/` directory
 
 ---
 
@@ -44,33 +92,93 @@
 
 ```
 Smart-IDS/
-├── main.py                   # Streamlit dashboard entry point
-├── requirements.txt          # Python dependencies
-├── Dockerfile                # Container definition
-├── simulate_attacks.py       # Standalone attack simulation CLI
-├── stress_test.py            # Load / stress testing utilities
 │
-├── backend/
-│   ├── auth.py               # Supabase Auth (sign-up, login, OAuth, password reset)
-│   ├── database.py           # SQLite initialisation
-│   ├── live_capture.py       # Packet capture thread + ML classification
-│   └── supabase_config.py    # Supabase client setup
+├── main.py                        # Legacy Streamlit dashboard entry point
+├── simulate_attacks.py            # Standalone attack simulation CLI
+├── requirements.txt               # Python dependencies (legacy stack)
+├── Dockerfile                     # Container definition
 │
-├── detection/
-│   ├── predict.py            # Inference helpers (load_artifacts, predict)
-│   └── capture.py            # Low-level capture utilities
+├── backend/                       # Legacy backend modules
+│   ├── auth.py                    # Supabase Auth helpers
+│   ├── database.py                # SQLite initialisation
+│   ├── ips_engine.py              # IPS evaluation engine
+│   ├── ips_actions.py             # IPS response actions
+│   ├── live_capture.py            # Scapy packet capture + ML classification
+│   └── supabase_config.py         # Supabase client setup
+│
+├── detection/                     # Inference helpers
+│   ├── predict.py                 # load_artifacts + predict()
+│   └── capture.py                 # Low-level capture utilities
 │
 ├── simulation/
-│   └── attack_generator.py   # AttackSimulator — generates synthetic traffic DataFrames
+│   └── attack_generator.py        # AttackSimulator — synthetic traffic DataFrames
 │
-├── src/
-│   └── train.py              # Model training pipeline
+├── src/                           # Model training pipeline
+│   ├── train.py
+│   ├── preprocess.py
+│   └── randomforest.py
 │
-├── alerts/                   # Alert processing module
-├── assets/                   # Static assets (banner, screenshots)
-├── data/                     # CICIDS2017 CSV files (not included — see Setup)
-├── models/                   # model.pkl & scaler.pkl (generated on first train)
-└── logs/                     # Auto-created daily prediction JSON logs
+├── alerts/                        # Alert processing module
+├── assets/                        # Static assets (banner, screenshots)
+├── data/                          # CICIDS2017 CSVs — not included, see Setup
+├── models/                        # model.pkl & scaler.pkl — generated on train
+├── logs/                          # Auto-created daily prediction JSON logs
+│
+└── ids-ips-platform/              # ✨ Full-stack IDS/IPS Platform (current)
+    ├── docker-compose.yml         # Multi-service orchestration
+    │
+    ├── backend/                   # FastAPI backend
+    │   ├── main.py                # App entry — CORS, lifespan, router registration
+    │   ├── core/
+    │   │   ├── config.py          # App settings
+    │   │   ├── database.py        # Supabase DB client
+    │   │   └── redis.py           # Redis client
+    │   ├── auth/
+    │   │   ├── verifier.py        # JWT verification via Supabase JWKS
+    │   │   └── dependencies.py    # FastAPI auth dependencies
+    │   ├── ids/
+    │   │   ├── detector.py        # Sliding-window rule engine
+    │   │   ├── rules.py           # ThresholdRule & CompositeRule definitions
+    │   │   └── scorer.py          # Severity & confidence scoring
+    │   ├── models/
+    │   │   ├── packet.py          # Packet Pydantic model
+    │   │   ├── alert.py           # Alert Pydantic model
+    │   │   └── user.py            # User profile model
+    │   ├── routers/
+    │   │   ├── traffic.py         # REST: /api/traffic
+    │   │   ├── alerts.py          # REST: /api/alerts
+    │   │   ├── logs.py            # REST: /api/logs
+    │   │   └── users.py           # REST: /api/users
+    │   ├── websocket/
+    │   │   ├── connection_manager.py   # Multi-client WS hub
+    │   │   ├── traffic_ws.py           # WS: /ws/traffic
+    │   │   └── alerts_ws.py            # WS: /ws/alerts
+    │   └── simulation/
+    │       ├── packet_generator.py     # Synthetic packet factory
+    │       ├── attack_scenarios.py     # Attack scenario definitions
+    │       └── scheduler.py            # Async simulation loop
+    │
+    └── frontend/                  # Next.js 16 frontend
+        ├── src/
+        │   ├── app/
+        │   │   ├── (dashboard)/   # Protected SOC dashboard pages
+        │   │   │   ├── page.tsx           # Overview
+        │   │   │   ├── traffic/page.tsx   # Live Traffic
+        │   │   │   ├── alerts/page.tsx    # Alerts Feed
+        │   │   │   ├── logs/page.tsx      # Prediction Logs
+        │   │   │   ├── intelligence/page.tsx  # Threat Intelligence
+        │   │   │   └── settings/page.tsx  # Settings
+        │   │   ├── login/page.tsx
+        │   │   ├── signup/page.tsx
+        │   │   └── auth/callback/route.ts # OAuth callback
+        │   ├── components/
+        │   │   └── layout/
+        │   │       ├── Sidebar.tsx
+        │   │       └── Topbar.tsx
+        │   └── lib/
+        │       ├── supabase/      # Supabase client & server helpers
+        │       └── useWebSocket.ts # Real-time WS hook
+        └── middleware.ts          # Route protection middleware
 ```
 
 ---
@@ -79,107 +187,129 @@ Smart-IDS/
 
 ### Prerequisites
 
-- Python **3.11+**
-- A [Supabase](https://supabase.com) project (free tier works)
-- CICIDS2017 dataset CSVs (see [Dataset](#dataset))
-- Administrator / root privileges for live packet capture (Scapy)
+| Requirement | Version |
+|:---|:---|
+| Python | 3.11+ |
+| Node.js | 18+ |
+| Supabase project | Free tier works |
+| Redis | 7+ (optional for caching) |
 
 ---
 
 ### 1 — Clone & Install
 
 ```bash
-git clone https://github.com/<your-username>/Smart-IDS.git
-cd Smart-IDS
+git clone https://github.com/Ansh5008/Smart_IntrusionDetectionSystem.git
+cd Smart_IntrusionDetectionSystem
+```
 
+**Backend:**
+```bash
+cd ids-ips-platform/backend
 python -m venv venv
 # Windows
 venv\Scripts\activate
 # macOS / Linux
 source venv/bin/activate
 
-pip install -r requirements.txt
+pip install fastapi uvicorn httpx python-jose supabase
+```
+
+**Frontend:**
+```bash
+cd ids-ips-platform/frontend
+npm install
 ```
 
 ---
 
-### 2 — Configure Supabase
+### 2 — Configure Environment
 
-Create a `.env` file in the project root:
+Create `ids-ips-platform/backend/.env`:
 
 ```env
 SUPABASE_URL=https://<your-project-ref>.supabase.co
-SUPABASE_KEY=<your-anon-public-key>
+SUPABASE_ANON_KEY=<your-anon-public-key>
+SUPABASE_JWT_SECRET=<your-jwt-secret>
+FRONTEND_URL=http://localhost:3000
+REDIS_URL=redis://localhost:6379
 ```
 
-> **Supabase Dashboard → Settings → API** to find your URL and anon key.
+Create `ids-ips-platform/frontend/.env.local`:
 
-Apply the following migration in the **Supabase SQL Editor** to create the profiles table:
-
-```sql
-create table public.profiles (
-  id        uuid primary key references auth.users(id) on delete cascade,
-  username  text unique not null,
-  email     text unique not null,
-  full_name text,
-  role      text default 'analyst'
-);
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-public-key>
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
+
+> **Supabase Dashboard → Settings → API** to find your URL, anon key, and JWT secret.
 
 ---
 
-### 3 — Add the Dataset
+### 3 — Run the Platform
 
-Download the [CICIDS2017 dataset](https://www.unb.ca/cic/datasets/ids-2017.html) CSV files and place them in the `data/` directory:
+**Start the FastAPI backend:**
+```bash
+cd ids-ips-platform/backend
+uvicorn main:app --reload --port 8000
+```
 
+**Start the Next.js frontend:**
+```bash
+cd ids-ips-platform/frontend
+npm run dev
 ```
-data/
-├── Monday-WorkingHours.pcap_ISCX.csv
-├── Tuesday-WorkingHours.pcap_ISCX.csv
-└── ...
-```
+
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+API docs available at **[http://localhost:8000/docs](http://localhost:8000/docs)**.
 
 ---
 
-### 4 — Train the Model
-
-Launch the app and navigate to **🧠 Model Center → Retrain Model**, or run training headlessly:
+### 4 — Docker (Full Stack)
 
 ```bash
-python -c "from src.train import train_from_csv; train_from_csv('data', 'Label', 'models/model.pkl', 'models/scaler.pkl')"
-```
-
-This produces `models/model.pkl` and `models/scaler.pkl`.
-
----
-
-### 5 — Run the Dashboard
-
-```bash
-streamlit run main.py
-```
-
-Open **[http://localhost:8501](http://localhost:8501)** in your browser.
-
----
-
-## Docker
-
-```bash
-# Build
-docker build -t cybershield-ids .
-
-# Run
-docker run -p 8501:8501 \
-  -e SUPABASE_URL=<url> \
-  -e SUPABASE_KEY=<key> \
-  cybershield-ids \
-  streamlit run main.py --server.port 8501 --server.address 0.0.0.0
+cd ids-ips-platform
+docker-compose up --build
 ```
 
 ---
 
-## ML Model
+## API Endpoints
+
+### REST
+
+| Method | Endpoint | Description |
+|:---|:---|:---|
+| `GET` | `/` | Service health & endpoint map |
+| `GET` | `/health` | Detailed health + simulation stats |
+| `GET` | `/api/traffic` | Recent packet stream (paginated) |
+| `GET` | `/api/alerts` | Alert feed with severity filters |
+| `GET` | `/api/logs` | Historical prediction logs |
+| `GET` | `/api/users` | User profile (auth required) |
+
+### WebSocket
+
+| Endpoint | Description |
+|:---|:---|
+| `ws://localhost:8000/ws/traffic` | Real-time packet stream |
+| `ws://localhost:8000/ws/alerts` | Real-time alert feed |
+
+---
+
+## Detection Rules
+
+| Attack Type | Rule Type | Signal |
+|:---|:---|:---|
+| **DDoS** | Threshold | Packet count from single IP > 100 in 10s |
+| **Port Scan** | Threshold | Unique destination ports from single IP > 20 in 30s |
+| **Brute Force** | Threshold | SYN packets to single port > 50 in 60s |
+| **Data Exfiltration** | Composite | Payload entropy > 7.0 AND size > 40KB AND non-standard port |
+
+---
+
+## ML Classifier (Batch Mode)
 
 | Property | Value |
 |:---|:---|
@@ -192,13 +322,45 @@ docker run -p 8501:8501 \
 | Recall | ~97.2% |
 | F1-Score | ~97.85% |
 
+**Train the model:**
+```bash
+python -c "from src.train import train_from_csv; train_from_csv('data', 'Label', 'models/model.pkl', 'models/scaler.pkl')"
+```
+
+Download the [CICIDS2017 dataset](https://www.unb.ca/cic/datasets/ids-2017.html) and place CSVs in `data/`.
+
+---
+
+## Tech Stack
+
+### Backend
+| Package | Purpose |
+|:---|:---|
+| `fastapi` | Async REST API & WebSocket server |
+| `uvicorn` | ASGI server |
+| `supabase` | Auth & database client |
+| `python-jose` | JWT verification |
+| `scikit-learn` | RandomForest classifier (batch mode) |
+| `scapy` | Live packet capture |
+| `pandas` / `numpy` | Data processing |
+
+### Frontend
+| Package | Purpose |
+|:---|:---|
+| `next` 16 | React framework (App Router) |
+| `@supabase/ssr` | Server-side auth & session management |
+| `recharts` | Real-time data visualisation |
+| `framer-motion` | UI animations |
+| `lucide-react` | Icon library |
+| `tailwindcss` 4 | Utility-first styling |
+
 ---
 
 ## Authentication & Roles
 
 | Role | Access |
 |:---|:---|
-| `analyst` | Default role — full dashboard access |
+| `analyst` | Default — full dashboard access |
 | `admin` | Full access + user management |
 | `viewer` | Read-only access |
 
@@ -209,25 +371,10 @@ Supported auth methods:
 
 ---
 
-## Dependencies
-
-| Package | Version | Purpose |
-|:---|:---|:---|
-| `streamlit` | ≥ 1.28 | Dashboard UI |
-| `plotly` | ≥ 5.17 | Interactive charts |
-| `scikit-learn` | latest | RandomForest classifier |
-| `pandas` / `numpy` | latest | Data processing |
-| `scapy` | latest | Live packet capture |
-| `supabase` | ≥ 2.0 | Auth & database |
-| `joblib` | latest | Model serialisation |
-| `scipy` | latest | Numerical utilities |
-
----
-
 ## ⚠️ Disclaimer
 
-This tool is intended for **educational and authorized security research purposes only**.  
-Do not use attack simulation or live packet capture on networks you do not own or have explicit written permission to test.
+This tool is intended for **educational and authorized security research purposes only**.
+Do not use attack simulation, packet capture, or IPS features on networks you do not own or have explicit written permission to test.
 
 ---
 
@@ -238,5 +385,5 @@ Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 ---
 
 <p align="center">
-  Made for cybersecurity education &nbsp;|&nbsp; CyberShield IDS v2.0
+  CyberShield IDS/IPS &nbsp;·&nbsp; Built for cybersecurity education and research &nbsp;·&nbsp; v2.0
 </p>
