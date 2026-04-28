@@ -1,0 +1,12 @@
+{
+  "name": "smart-intrusion-detection-system",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd ids-ips-platform/frontend && npm install",
+    "dev": "cd ids-ips-platform/frontend && npm run dev",
+    "build": "cd ids-ips-platform/frontend && npm run build",
+    "start": "cd ids-ips-platform/frontend && npm run start",
+    "lint": "cd ids-ips-platform/frontend && npm run lint"
+  }
+}

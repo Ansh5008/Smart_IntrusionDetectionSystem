@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ids-ips-frontend
+    env: node
+    rootDir: ids-ips-platform/frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
