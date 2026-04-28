@@ -205,7 +205,7 @@ def evaluate_packet(packet_info: dict, ml_prediction: str, ml_confidence: float)
         # If State is THROTTLE, apply token bucket probability drop logically
         if profile.state == "THROTTLE":
             # Just token bucket simulate drop 50% of packets
-            if current_time * 1000 % 2 == 0: 
+            if int(current_time * 1000) % 2 == 0:
                 return False
 
     return True
@@ -224,4 +224,6 @@ def inject_threat_intel(ip_address: str, severity: int = 100):
     with profiles_lock:
         profile = ip_profiles[ip_address]
         profile.risk_score = min(100.0, profile.risk_score + severity)
-        profile.state = "MONITOR" # Reset to trigger next phase
+        # Only set to MONITOR if not already in a higher-severity state
+        if profile.state == "NORMAL":
+            profile.state = "MONITOR"

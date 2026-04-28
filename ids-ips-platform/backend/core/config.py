@@ -1,8 +1,10 @@
-"""Core configuration — hardcoded for development."""
+"""Core configuration — reads from environment variables with sensible defaults."""
 from __future__ import annotations
 
+from pydantic_settings import BaseSettings
 
-class Settings:
+
+class Settings(BaseSettings):
     supabase_url: str = "https://xbosoldcnfhtshqfvxdn.supabase.co"
     supabase_anon_key: str = (
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
@@ -13,6 +15,8 @@ class Settings:
     supabase_jwks_url: str = "https://xbosoldcnfhtshqfvxdn.supabase.co/auth/v1/.well-known/jwks.json"
     redis_url: str = "redis://redis:6379"
     frontend_url: str = "http://localhost:3000"
+
+    model_config = {"env_file": ".env", "case_sensitive": False}
 
 
 settings = Settings()

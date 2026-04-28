@@ -33,9 +33,10 @@ export default function SignupPage() {
     if (err) { setError(err.message); setLoading(false); return; }
 
     if (data.user) {
-      await supabase.from("profiles").insert({
+      const { error: profileErr } = await supabase.from("profiles").insert({
         id: data.user.id, username, email, full_name: fullName, role,
       });
+      if (profileErr) { setError(profileErr.message); setLoading(false); return; }
       setSuccess(true);
       setTimeout(() => router.push("/login"), 2000);
     }
